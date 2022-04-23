@@ -1,0 +1,14 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renderArticle should render the article 1`] = `
+"<article>
+        <div>
+            Written by Ben Cook
+            <br>
+            Published on 24/04/2022, 00:20:24
+        </div>
+        <p>
+        Title
+        </p>
+    </article>"
+`;
