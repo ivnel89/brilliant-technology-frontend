@@ -1,6 +1,7 @@
 import Api from "../../api";
 import * as $ from "jquery";
 import { Article } from "../../api/contract";
+import { renderDiscussion } from "../discussion/discussion";
 
 const api = new Api();
 
@@ -24,9 +25,13 @@ export const renderArticle = async () => {
         ${article?.content}
         </p>
     </article>
+    <div class="discussion-container" data-article-id="${article.id}">
+    </div>
     `)
     $(`#root`).append(articleMarkup);
-
+    return article;
 }
 
-renderArticle();
+renderArticle().then((article: Article) => {
+    renderDiscussion(article)
+});
