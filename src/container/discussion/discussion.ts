@@ -4,14 +4,17 @@ import { Article, Comment } from "../../api/contract";
 import { formatDistance } from 'date-fns'
 import Api from "../../api";
 import { getUserId } from "../../helper/getUserId";
-import { CustomEventKey } from "../../helper/customEventKey";
 import { getUser } from "../../helper/getUser";
 
 const api = new Api();
 
+const renderUpVoteButton = (comment: Comment) => {
+  return `${comment.upVoted ? "▼" : "▲"} ${comment.upVotes ? comment.upVotes : "upvote"}`
+} 
+
 const renderComment = (comment: Comment) => {
     return $(`
-    <div data-comment class="flex my-8">
+    <div data-comment-id="${comment.id}" data-user-upvoted="${comment.upVoted||false}" class="flex my-8">
     <div class="w-9 mr-3">
     <img src="${comment.author.displayPicture}" class="rounded-full h-9 w-9"/>
     </div>
@@ -28,11 +31,8 @@ const renderComment = (comment: Comment) => {
             ${comment.content}
         </p>
         <div>
-            <button class="py-1 px-3 text-sm text-slate-500">
-                ▲ Upvote
-            </button>
-            <button class="py-1 px-3 text-sm text-slate-500">
-                Reply
+            <button class="py-1 px-3 text-sm text-slate-500 upvote-btn">
+                ${renderUpVoteButton(comment)}
             </button>
         </div>
     </div>
@@ -51,9 +51,29 @@ export const renderDiscussion = (article: Article) => {
  </div>
  `);
   $("#comments-section").append(renderComments(article.comments));
+  $(`#comments-section`).on('click','[data-comment-id] .upvote-btn', function(){
+    const commentId = $(this).parents(`[data-comment-id]`).attr(`data-comment-id`)
+    const userUpvoted =  JSON.parse($(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`))
+    if(userUpvoted)
+      api.downVote(commentId).then(comment => {
+        $(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`,"false")
+        $(this).html(
+          renderUpVoteButton(comment)
+        )
+      })
+    else
+      api.upVote(commentId).then(comment => {
+        $(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`,"true")
+        $(this).html(
+          renderUpVoteButton(comment)
+        )
+      })
+  })
 
-  $(document).on(CustomEventKey.LOGIN, function () {
     const user = getUser();
+    if(!user){
+      return
+    }
     $(`#add-comment-form-container`).append(`
      <form class="flex flex-row content-center" id="add-comment-form">
         <img src="${user.displayPicture}" class="rounded-full h-9 mr-3"/>
@@ -77,5 +97,5 @@ export const renderDiscussion = (article: Article) => {
           });
         });
     });
-  });
+
 }

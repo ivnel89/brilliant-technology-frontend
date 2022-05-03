@@ -32,7 +32,8 @@ export const renderArticle = async () => {
     return article;
 }
 
-renderArticle().then((article: Article) => {
-    renderDiscussion(article)
-    api.login();
+api.login().then(() => {
+    renderArticle().then((article: Article) => {
+        renderDiscussion(article)
+    });    
 });

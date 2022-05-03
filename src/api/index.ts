@@ -1,7 +1,7 @@
 import axios, { AxiosInstance } from 'axios'
 import { Config } from '../config';
 import { CustomEventKey } from '../helper/customEventKey';
-import { setUserId } from '../helper/getUserId';
+import { getUserId, setUserId } from '../helper/getUserId';
 import { Article, Comment, User } from './contract';
 import { CreateCommentDto } from './contract/dto';
 import * as $ from "jquery";
@@ -22,7 +22,11 @@ class Api {
     }
 
     async fetchArticleById(id: string): Promise<Article>{
-        const response = await this._client.get<Article>(`/article/${id}`)
+        const response = await this._client.get<Article>(`/article/${id}`,{
+            params:{
+                requesterId: getUserId()
+            }
+        })
         return response.data
     }
 
@@ -55,6 +59,25 @@ class Api {
         setUserId(user.id);
         setUser(user);
         $(document).trigger(CustomEventKey.LOGIN)
+    }
+
+    async upVote(id: string): Promise<Comment>{
+        const response = await this._client.put<Comment>(
+          `/comment/${id}/upvote/add`,
+          {
+            userId: getUserId(),
+          }
+        );
+        return response.data
+    }
+
+    async downVote(id: string): Promise<Comment>{
+        const response = await this._client.put<Comment>(`/comment/${id}/upvote/remove`,{
+   
+                userId: getUserId()
+            
+        });
+        return response.data
     }
 }
 
