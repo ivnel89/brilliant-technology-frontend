@@ -34,4 +34,5 @@ export const renderArticle = async () => {
 
 renderArticle().then((article: Article) => {
     renderDiscussion(article)
+    api.login();
 });

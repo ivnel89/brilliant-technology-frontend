@@ -1,7 +1,11 @@
 import axios, { AxiosInstance } from 'axios'
 import { Config } from '../config';
-import { Article, Comment } from './contract';
+import { CustomEventKey } from '../helper/customEventKey';
+import { setUserId } from '../helper/getUserId';
+import { Article, Comment, User } from './contract';
 import { CreateCommentDto } from './contract/dto';
+import * as $ from "jquery";
+import { setUser } from '../helper/getUser';
 
 class Api {
     private _client : AxiosInstance;
@@ -29,6 +33,28 @@ class Api {
         data.content = content;
         const response = await this._client.post<Comment>(`/comment`, data);
         return response.data
+    }
+
+    async fetchUsers(offset=0, limit=10): Promise<Array<User>>{
+        const response = await this._client.get<Array<User>>(`/user`,{
+            params:{
+                offset,
+                limit
+            }
+        });
+        return response.data
+    }
+
+    async getRandomUser(): Promise<User>{
+        const users = await this.fetchUsers();
+        return users[Math.floor(Math.random()*users.length)];
+    }
+
+    async login(){
+        const user = await this.getRandomUser()
+        setUserId(user.id);
+        setUser(user);
+        $(document).trigger(CustomEventKey.LOGIN)
     }
 }
 
