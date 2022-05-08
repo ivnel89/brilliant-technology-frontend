@@ -11,7 +11,7 @@ const api = new Api();
 
 const renderComment = (comment: Comment) => {
     return $(`
-    <div data-comment-id="${comment.id}" data-user-upvoted="${comment.upVoted||false}" class="flex my-8">
+    <div data-comment-id="${comment.id}" class="flex my-8">
     <div class="w-9 mr-3">
     <img src="${comment.author.displayPicture}" class="rounded-full h-9 w-9"/>
     </div>
@@ -27,12 +27,11 @@ const renderComment = (comment: Comment) => {
         <p class="font-light mb-2 mt-1">
             ${comment.content}
         </p>
-        <div>
-            ${renderUpVoteButton(comment)}
+        <div id="up-vote-${comment.id}">
         </div>
     </div>
 </div>
-    `)
+    `);
 }
 
 const renderComments = (comments: Array<Comment>) => comments.map(comment => renderComment(comment));
@@ -46,24 +45,10 @@ export const renderDiscussion = (article: Article) => {
  </div>
  `);
   $("#comments-section").append(renderComments(article.comments));
-  $(`#comments-section`).on('click','[data-comment-id] .upvote-btn', function(){
-    const commentId = $(this).parents(`[data-comment-id]`).attr(`data-comment-id`)
-    const userUpvoted =  JSON.parse($(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`))
-    if(userUpvoted)
-      api.downVote(commentId).then(comment => {
-        $(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`,"false")
-        $(this).replaceWith(
-          renderUpVoteButton(comment)
-        )
-      })
-    else
-      api.upVote(commentId).then(comment => {
-        $(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`,"true")
-        $(this).replaceWith(
-          renderUpVoteButton(comment)
-        )
-      })
+  article.comments.forEach(comment => {
+    renderUpVoteButton(comment, `up-vote-${comment.id}`);
   })
+
 
     const user = getUser();
     if(!user){
@@ -87,6 +72,7 @@ export const renderDiscussion = (article: Article) => {
         .addComment(getUserId(), article.id, values.content)
         .then((comment: Comment) => {
           $("#comments-section").prepend(renderComment(comment));
+          renderUpVoteButton(comment, `up-vote-${comment.id}`);
           inputs.each(function (this) {
             $(this).val("");
           });
