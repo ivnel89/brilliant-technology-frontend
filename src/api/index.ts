@@ -3,7 +3,7 @@ import { Config } from '../config';
 import { CustomEventKey } from '../helper/customEventKey';
 import { getUserId, setUserId } from '../helper/getUserId';
 import { Article, Comment, User } from './contract';
-import { CreateCommentDto } from './contract/dto';
+import { CreateCommentDto, GetCommentsDto } from './contract/dto';
 import * as $ from "jquery";
 import { setUser } from '../helper/getUser';
 
@@ -78,6 +78,16 @@ class Api {
             
         });
         return response.data
+    }
+
+    async getCommentsById(id: Array<string>): Promise<Array<Comment>>{
+        const data = new GetCommentsDto()
+        data.commentIds = id;
+        data.userId = getUserId()
+        const response = await this._client.get<Array<Comment>>(`/comment`,{
+            params:data
+        });
+    return response.data
     }
 }
 

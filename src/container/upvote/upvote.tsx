@@ -5,7 +5,7 @@ import {  Comment } from "../../api/contract";
 
 export function renderUpVoteButton(
   comment: Comment,
-  targetId: string,
+  targetId: string
   ){
   const app = document.getElementById(targetId);
   ReactDOM.render(<UpVoteButton comment={comment}/>, app)

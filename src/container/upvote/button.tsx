@@ -1,6 +1,8 @@
 import react from "react";
 import Api from "../../api";
 import { Comment } from "../../api/contract";
+import * as $ from "jquery";
+import { CustomEventKey } from "../../helper/customEventKey";
 
 const api = new Api();
 
@@ -20,16 +22,20 @@ export function UpVoteButton({ comment }: { comment: Comment }) {
   const handleClick = (e: react.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     if (upVoted) {
       api.downVote(comment.id).then(comment => {
-          setUpVotes(comment.upVotes)
-          setUpVoted(comment.upVoted)
+          setUpVotes(comment.upVotes-1)
+          setUpVoted(false)
       });
     } else {
       api.upVote(comment.id).then(comment => {
-        setUpVotes(comment.upVotes)
-        setUpVoted(comment.upVoted)
+        setUpVotes(comment.upVotes+1)
+        setUpVoted(true)
     });;
     }
   };
+
+  $(document).on(CustomEventKey.UP_VOTE_UPDATE, function(e,data){
+    setUpVotes(data[comment.id])
+  })
 
   return (
     <button

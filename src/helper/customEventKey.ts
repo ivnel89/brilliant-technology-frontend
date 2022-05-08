@@ -1,3 +1,4 @@
 export enum CustomEventKey {
-    LOGIN = 'login'
+    LOGIN = 'login',
+    UP_VOTE_UPDATE = 'upVoteUpdate' 
 }

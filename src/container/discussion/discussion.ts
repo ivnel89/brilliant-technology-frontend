@@ -6,6 +6,7 @@ import Api from "../../api";
 import { getUserId } from "../../helper/getUserId";
 import { getUser } from "../../helper/getUser";
 import { renderUpVoteButton } from "../upvote/upvote";
+import { CustomEventKey } from "../../helper/customEventKey";
 
 const api = new Api();
 
@@ -48,7 +49,15 @@ export const renderDiscussion = (article: Article) => {
   article.comments.forEach(comment => {
     renderUpVoteButton(comment, `up-vote-${comment.id}`);
   })
-
+  setInterval(async () => {
+    const commentIds =  article.comments.map(comment => comment.id);
+    const comments = await api.getCommentsById(commentIds)
+    const upVotesObject: Record<string,number> = {}
+    comments.forEach((comment) => {
+      upVotesObject[comment.id] = comment.upVotes
+    })
+    $(document).trigger(CustomEventKey.UP_VOTE_UPDATE, [upVotesObject]);
+  },10000)
 
     const user = getUser();
     if(!user){
