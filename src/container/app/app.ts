@@ -9,7 +9,7 @@ export const fetchArticlesAndDisplay = () => api.fetchAllArticles().then((articl
       (article) =>
         $(`
         <li>
-            <a href="/article?id=${article.id}">
+            <a href="/article.html?id=${article.id}">
                 ${article.content.slice(0, 20)}
             </article>
         </li>
