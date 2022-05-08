@@ -5,12 +5,9 @@ import { formatDistance } from 'date-fns'
 import Api from "../../api";
 import { getUserId } from "../../helper/getUserId";
 import { getUser } from "../../helper/getUser";
+import { renderUpVoteButton } from "../upvote/upvote";
 
 const api = new Api();
-
-const renderUpVoteButton = (comment: Comment) => {
-  return `${comment.upVoted ? "▼" : "▲"} ${comment.upVotes ? comment.upVotes : "upvote"}`
-} 
 
 const renderComment = (comment: Comment) => {
     return $(`
@@ -31,9 +28,7 @@ const renderComment = (comment: Comment) => {
             ${comment.content}
         </p>
         <div>
-            <button class="py-1 px-3 text-sm text-slate-500 upvote-btn">
-                ${renderUpVoteButton(comment)}
-            </button>
+            ${renderUpVoteButton(comment)}
         </div>
     </div>
 </div>
@@ -57,14 +52,14 @@ export const renderDiscussion = (article: Article) => {
     if(userUpvoted)
       api.downVote(commentId).then(comment => {
         $(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`,"false")
-        $(this).html(
+        $(this).replaceWith(
           renderUpVoteButton(comment)
         )
       })
     else
       api.upVote(commentId).then(comment => {
         $(this).parents(`[data-comment-id]`).attr(`data-user-upvoted`,"true")
-        $(this).html(
+        $(this).replaceWith(
           renderUpVoteButton(comment)
         )
       })
