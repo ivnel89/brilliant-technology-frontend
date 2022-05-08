@@ -50,7 +50,20 @@ export const renderDiscussion = (article: Article) => {
     renderUpVoteButton(comment, `up-vote-${comment.id}`);
   })
   setInterval(async () => {
-    const commentIds =  article.comments.map(comment => comment.id);
+    const commentIds = $(`[data-comment-id]`)
+      .map(function (this) {
+        const rect = $(this).get()[0].getBoundingClientRect();
+        if (
+          rect.top >= 0 &&
+          rect.left >= 0 &&
+          rect.bottom <= $(window).height() &&
+          rect.right <= $(window).width()
+        ) {
+          return $(this).attr("data-comment-id");
+        }
+      })
+      .toArray()
+      .filter((_) => Boolean(_));
     const comments = await api.getCommentsById(commentIds)
     const upVotesObject: Record<string,number> = {}
     comments.forEach((comment) => {
