@@ -7,6 +7,7 @@ export class CreateCommentDto {
   export class GetCommentsDto {
     userId: string;
     commentIds: Array<string>;
+    articleId: string;
   }
   
   

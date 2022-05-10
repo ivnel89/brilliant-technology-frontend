@@ -89,6 +89,16 @@ class Api {
         });
     return response.data
     }
+
+    async getCommentsByArticleId(id: string): Promise<Array<Comment>>{
+        const data = new GetCommentsDto()
+        data.articleId = id;
+        data.userId = getUserId()
+        const response = await this._client.get<Array<Comment>>(`/comment`,{
+            params:data
+        });
+    return response.data
+    }
 }
 
 export default Api;

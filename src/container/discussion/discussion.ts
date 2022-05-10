@@ -37,7 +37,8 @@ const renderComment = (comment: Comment) => {
 
 const renderComments = (comments: Array<Comment>) => comments.map(comment => renderComment(comment));
 
-export const renderDiscussion = (article: Article) => {
+export const renderDiscussion = async (article: Article) => {
+  const comments = await api.getCommentsByArticleId(article.id)
   $(`[data-article-id="${article.id}"]`).append(`
  <div class="" id="add-comment-form-container">
     <h2 class="text-xl font-bold my-10">Discussion</h2>
@@ -45,8 +46,8 @@ export const renderDiscussion = (article: Article) => {
  <div class="py-5" id="comments-section">
  </div>
  `);
-  $("#comments-section").append(renderComments(article.comments));
-  article.comments.forEach(comment => {
+  $("#comments-section").append(renderComments(comments));
+  comments.forEach(comment => {
     renderUpVoteButton(comment, `up-vote-${comment.id}`);
   })
   setInterval(async () => {
