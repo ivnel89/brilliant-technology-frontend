@@ -20,4 +20,5 @@ export interface Comment {
     createdDate: Date;
     upVotes: number;
     upVoted: boolean;
+    replies: Array<Comment>
 }

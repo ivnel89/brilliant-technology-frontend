@@ -10,32 +10,46 @@ import { CustomEventKey } from "../../helper/customEventKey";
 
 const api = new Api();
 
-const renderComment = (comment: Comment) => {
+const renderComment = (comment: Comment): JQuery<HTMLElement> => {
     return $(`
-    <div data-comment-id="${comment.id}" class="flex my-8">
-    <div class="w-9 mr-3">
-    <img src="${comment.author.displayPicture}" class="rounded-full h-9 w-9"/>
-    </div>
-    <div class="w-fit">
-        <div>
-            <span class="font-semibold">
-                ${comment.author.firstName} ${comment.author.lastName}
-            </span>
-            <span class="text-sm font-extralight">
-            ・ ${formatDistance(new Date(comment.createdDate), new Date())}
-            </span>
+    <div>
+      <div data-comment-id="${comment.id}" class="flex my-8">
+        <div class="w-9 mr-3">
+        <img src="${comment.author.displayPicture}" class="rounded-full h-9 w-9"/>
         </div>
-        <p class="font-light mb-2 mt-1">
-            ${comment.content}
-        </p>
-        <div id="up-vote-${comment.id}">
+        <div class="w-fit">
+            <div>
+                <span class="font-semibold">
+                    ${comment.author.firstName} ${comment.author.lastName}
+                </span>
+                <span class="text-sm font-extralight">
+                ・ ${formatDistance(new Date(comment.createdDate), new Date())}
+                </span>
+            </div>
+            <p class="font-light mb-2 mt-1">
+                ${comment.content}
+            </p>
+            <div id="up-vote-${comment.id}">
+            </div>
         </div>
+      </div>
+      <div class="pl-10">
+      ${comment.replies.map(
+        reply => renderComment(reply).html()
+      ).join("")}
+      </div>
     </div>
-</div>
     `);
 }
 
 const renderComments = (comments: Array<Comment>) => comments.map(comment => renderComment(comment));
+
+const renderAllUpVoteButtons = (comments: Array<Comment>) =>{
+  comments.forEach(comment => {
+    renderUpVoteButton(comment, `up-vote-${comment.id}`);
+    renderAllUpVoteButtons(comment.replies);
+  })
+}
 
 export const renderDiscussion = async (article: Article) => {
   const comments = await api.getCommentsByArticleId(article.id)
@@ -47,9 +61,7 @@ export const renderDiscussion = async (article: Article) => {
  </div>
  `);
   $("#comments-section").append(renderComments(comments));
-  comments.forEach(comment => {
-    renderUpVoteButton(comment, `up-vote-${comment.id}`);
-  })
+  renderAllUpVoteButtons(comments);
   setInterval(async () => {
     const commentIds = $(`[data-comment-id]`)
       .map(function (this) {
