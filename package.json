@@ -1,6 +1,6 @@
 {
   "name": "comment-and-replies-frontend",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "",
   "browserslist": "> 0.5%, last 2 versions, not dead",
   "scripts": {
