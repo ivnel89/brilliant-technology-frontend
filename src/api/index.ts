@@ -3,7 +3,7 @@ import { Config } from '../config';
 import { CustomEventKey } from '../helper/customEventKey';
 import { getUserId, setUserId } from '../helper/getUserId';
 import { Article, Comment, User } from './contract';
-import { CreateCommentDto, GetCommentsDto } from './contract/dto';
+import { CreateArticleDto, CreateCommentDto, CreateUserDto, GetCommentsDto } from './contract/dto';
 import * as $ from "jquery";
 import { setUser } from '../helper/getUser';
 
@@ -100,6 +100,17 @@ class Api {
         });
     return response.data
     }
+
+    async createUser(createUserDto: CreateUserDto){
+        const response = await this._client.post<User>(`/user`,createUserDto);
+        return response.data
+    }
+
+    async createArticle(createArticleDto: CreateArticleDto){
+        const response = await this._client.post<Article>(`/article`,createArticleDto)
+        return response.data
+    }
+
 }
 
 export default Api;

@@ -11,4 +11,13 @@ export class CreateCommentDto {
     articleId: string;
   }
   
-  
+  export class CreateUserDto {
+    firstName: string;
+    lastName: string;
+    displayPicture: string;
+  }
+
+  export class CreateArticleDto {
+    content: string; 
+    authorId: string;
+}
