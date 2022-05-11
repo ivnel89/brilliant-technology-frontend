@@ -30,11 +30,12 @@ class Api {
         return response.data
     }
 
-    async addComment(userId: string, articleId: string, content: string): Promise<Comment>{
+    async addComment(userId: string, articleId: string, content: string, parentCommentId?: string): Promise<Comment>{
         const data : CreateCommentDto = new CreateCommentDto();
         data.articleId = articleId;
         data.authorId = userId;
         data.content = content;
+        data.parentCommentId = parentCommentId;
         const response = await this._client.post<Comment>(`/comment`, data);
         return response.data
     }

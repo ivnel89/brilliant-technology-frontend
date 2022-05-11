@@ -10,7 +10,7 @@ import { CustomEventKey } from "../../helper/customEventKey";
 
 const api = new Api();
 
-const renderComment = (comment: Comment): JQuery<HTMLElement> => {
+const renderComment = (comment: Comment, isReply=false): JQuery<HTMLElement> => {
     return $(`
     <div>
       <div data-comment-id="${comment.id}" class="flex my-8">
@@ -29,13 +29,19 @@ const renderComment = (comment: Comment): JQuery<HTMLElement> => {
             <p class="font-light mb-2 mt-1">
                 ${comment.content}
             </p>
-            <div id="up-vote-${comment.id}">
+            <div class="flex">
+              <div id="up-vote-${comment.id}">
+              </div>
+              ${isReply ? `` : `<button class="py-1 px-3 text-sm text-slate-500 reply-btn">Reply</button>`}
             </div>
-        </div>
+            <form class="add-reply-form" >
+              <input style="display:none;" name="reply-content" class="border-solid border-2 border-gray-200 rounded w-full px-2 py-1 reply-input"/>
+            </form>
+            </div>
       </div>
       <div class="pl-10">
       ${comment.replies.map(
-        reply => renderComment(reply).html()
+        reply => renderComment(reply, true).html()
       ).join("")}
       </div>
     </div>
@@ -62,6 +68,14 @@ export const renderDiscussion = async (article: Article) => {
  `);
   $("#comments-section").append(renderComments(comments));
   renderAllUpVoteButtons(comments);
+  $(document).on(`click`,`.reply-btn`,function(){
+    const commentId = $(this).parents(`[data-comment-id]`).attr(`data-comment-id`);
+    const input = $(`[data-comment-id="${commentId}"] .reply-input`)
+    if(input.css("display") == "none")
+      input.show()
+    else
+      input.hide() 
+  })
   setInterval(async () => {
     const commentIds = $(`[data-comment-id]`)
       .map(function (this) {
@@ -107,6 +121,26 @@ export const renderDiscussion = async (article: Article) => {
         .addComment(getUserId(), article.id, values.content)
         .then((comment: Comment) => {
           $("#comments-section").prepend(renderComment(comment));
+          renderUpVoteButton(comment, `up-vote-${comment.id}`);
+          inputs.each(function (this) {
+            $(this).val("");
+          });
+        });
+    });
+
+    $(document).on("submit",".add-reply-form", function (e) {
+      e.preventDefault();
+      const inputs = $(this).children(`input`);
+      let values: Record<any, any> = {};
+      inputs.each(function (this) {
+        values[$(this).attr("name")] = $(this).val();
+      });
+      const parentCommentId = $(this).parents(`[data-comment-id]`).attr(`data-comment-id`);
+      console.log(parentCommentId)
+      api
+        .addComment(getUserId(), article.id, values["reply-content"], parentCommentId)
+        .then((comment: Comment) => {
+          $(`[data-comment-id="${parentCommentId}"] + div`).prepend(renderComment(comment,true));
           renderUpVoteButton(comment, `up-vote-${comment.id}`);
           inputs.each(function (this) {
             $(this).val("");

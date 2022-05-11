@@ -2,6 +2,7 @@ export class CreateCommentDto {
     content: string;
     authorId: string;
     articleId: string;
+    parentCommentId?: string;
   }
 
   export class GetCommentsDto {
