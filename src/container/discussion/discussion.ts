@@ -7,6 +7,7 @@ import { getUserId } from "../../helper/getUserId";
 import { getUser } from "../../helper/getUser";
 import { renderUpVoteButton } from "../upvote/upvote";
 import { CustomEventKey } from "../../helper/customEventKey";
+import {loadSpinner} from '../../component/loadSpinner';
 
 const api = new Api();
 
@@ -107,11 +108,17 @@ export const renderDiscussion = async (article: Article) => {
      <form class="flex flex-row content-center" id="add-comment-form">
         <img src="${user.displayPicture}" class="rounded-full h-9 mr-3"/>
         <input name="content" class="border-solid border-2 border-gray-200 rounded w-full px-2 py-1" placeholder="What are your toughts?" />
-        <button type="submit" class="rounded bg-violet-700 text-white px-5 py-1 ml-3">Comment</button>
+        <button type="submit" id="comment-submit-btn" class="rounded bg-violet-700 text-white px-5 py-1 ml-3">
+          Comment
+        </button>
      </form>
      <div class="pt-10 w-full h-0 border-gray-200 border-b-2" />`);
     $("#add-comment-form").on("submit", function (e) {
       e.preventDefault();
+      $(`#comment-submit-btn`)
+      .empty()
+      .append(loadSpinner)
+      .attr("disabled","disabled")
       const inputs = $("#add-comment-form :input");
       let values: Record<any, any> = {};
       inputs.each(function (this) {
@@ -125,7 +132,13 @@ export const renderDiscussion = async (article: Article) => {
           inputs.each(function (this) {
             $(this).val("");
           });
-        });
+        }).catch(e=>{
+          alert("Failed to post comment");
+        }).finally(() => {
+          $(`#comment-submit-btn`)
+          .html('Comment')
+          .removeAttr("disabled")
+        });;
     });
 
     $(document).on("submit",".add-reply-form", function (e) {
@@ -134,16 +147,23 @@ export const renderDiscussion = async (article: Article) => {
       let values: Record<any, any> = {};
       inputs.each(function (this) {
         values[$(this).attr("name")] = $(this).val();
+        $(this).attr("disabled","disabled")
       });
       const parentCommentId = $(this).parents(`[data-comment-id]`).attr(`data-comment-id`);
-      console.log(parentCommentId)
       api
         .addComment(getUserId(), article.id, values["reply-content"], parentCommentId)
-        .then((comment: Comment) => {
+        .then(async (comment: Comment) => {
           $(`[data-comment-id="${parentCommentId}"] + div`).prepend(renderComment(comment,true));
           renderUpVoteButton(comment, `up-vote-${comment.id}`);
           inputs.each(function (this) {
             $(this).val("");
+          });
+        }).catch(e => {
+          alert("Failed to post reply")
+        })
+        .finally(() => {
+          inputs.each(function (this) {
+            $(this).removeAttr("disabled");
           });
         });
     });
