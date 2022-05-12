@@ -2,7 +2,7 @@
 
 exports[`fetchArticlesAndDisplay should add article links to the DOM 1`] = `
 "<ol><li>
-            <a href=\\"/article?id=mockArticleId\\">
+            <a href=\\"/article.html?id=mockArticleId\\">
                 Title
             
         </a></li></ol>"
