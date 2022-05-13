@@ -34,7 +34,8 @@ export function UpVoteButton({ comment }: { comment: Comment }) {
   };
 
   $(document).on(CustomEventKey.UP_VOTE_UPDATE, function(e,data){
-    setUpVotes(data[comment.id])
+    if(data[comment.id] !== undefined)
+      setUpVotes(data[comment.id])
   })
 
   return (
